@@ -2,13 +2,20 @@ image:
   - Visual Studio 2017
   
 environment:
-  CMAKE_GENERATOR: 'Visual Studio 15 2017 Win64'
-  CONFIG: Release
-  ARCH: x64
-  CMAKE_INSTALL_PREFIX: ..\build
-  PCRE_DEST: C:\projects\bin\%ARCH%-static\pcre
-  CORE_DEST: C:\projects\bin\%ARCH%-static\core
-  
+  matrix:
+  - CMAKE_GENERATOR: 'Visual Studio 15 2017 Win64'
+    CONFIG: Release
+    ARCH: x64
+    CMAKE_INSTALL_PREFIX: ..\build
+    PCRE_DEST: C:\projects\bin\%ARCH%-static\pcre
+    CORE_DEST: C:\projects\bin\%ARCH%-static\core
+  - CMAKE_GENERATOR: 'Visual Studio 15 2017'
+    CONFIG: Release
+    ARCH: x86
+    CMAKE_INSTALL_PREFIX: ..\build
+    PCRE_DEST: C:\projects\bin\%ARCH%-static\pcre
+    CORE_DEST: C:\projects\bin\%ARCH%-static\core
+
 install:
   - cmake --version
   - git submodule init
@@ -21,7 +28,7 @@ install:
   # Build and install PCRE
   - mkdir %PCRE_DEST%
   - cd %PCRE_DEST%
-  - cmake -G "%CMAKE_GENERATOR%" -DCMAKE_INSTALL_PREFIX="%CMAKE_INSTALL_PREFIX%" -DPCRE_STATIC_RUNTIME="ON" -DBUILD_SHARED_LIBS="OFF" -DPCRE_BUILD_PCRECPP=OFF -DPCRE_BUILD_PCREGREP=OFF -DPCRE_BUILD_TESTS=OFF C:\projects\pcre
+  - cmake -G "%CMAKE_GENERATOR%" -DCMAKE_INSTALL_PREFIX="%CMAKE_INSTALL_PREFIX%" -DPCRE_STATIC_RUNTIME="ON" -DBUILD_SHARED_LIBS="OFF" -DPCRE_BUILD_PCRECPP=OFF -DPCRE_BUILD_PCREGREP=OFF -DPCRE_BUILD_TESTS=OFF -DPCRE_SUPPORT_UTF=ON C:\projects\pcre
   - cd %PCRE_DEST%
   - cmake --build %PCRE_DEST% --target install -- /p:Configuration=%CONFIG%
   
@@ -39,4 +46,5 @@ test_script:
 
 on_failure:
   - echo. && echo. && echo. && echo "Tests for editorconfig-core-c failed. Here is their detailed output:" && echo. && echo. && echo.
-  - type C:\projects\bin\x64-static\core\Testing\Temporary\LastTest.log
+  - cd %CORE_DEST%\Testing\Temporary
+  - type LastTest.log
