@@ -35,8 +35,7 @@ jobs:
       id: tagName
 
     - name: Get short SHA
-      if: 	steps.tagName.outputs.tag == ''
-      run: echo "SHORT_SHA=$("${{ github.sha }}".SubString(0, 8))" >> steps.tagName.outputs.tag
+      run: echo "SHORT_SHA=$("${{ github.sha }}".SubString(0, 8))" >> $env:GITHUB_ENV
 
     - name: zip artifacts for ${{ matrix.build_platform }} on ${{ github.ref_name }} with sha ${{ github.sha }}
       if: matrix.build_configuration == 'Release'
@@ -46,7 +45,7 @@ jobs:
       if: matrix.build_configuration == 'Release'
       uses: actions/upload-artifact@v4
       with:
-          name: editorconfig-core-c_${{ steps.tagName.outputs.tag }}_${{ matrix.build_platform }}.zip
+          name: editorconfig-core-c_${{ env.SHORT_SHA }}_${{ matrix.build_platform }}.zip
           path: editorconfig-core-c_${{ steps.tagName.outputs.tag }}_${{ matrix.build_platform }}.zip
 
     - name: Create release on tagging
